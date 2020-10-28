@@ -13,6 +13,7 @@ const Bicycle = require('./bicycle')
 const userSchema = new mongoose.Schema({
     username: {
         type: String,
+        unique:true,
         required: true,
         trim: true
     },
@@ -95,13 +96,14 @@ userSchema.methods.toJSON = function () {
 
     delete userObject.password
     delete userObject.tokens
+    delete userObject._id
 
     return userObject
 }
 
 userSchema.methods.generateAuthToken = async function() {
     const user = this
-    const token = jwt.sign({ _id: user.id.toString() }, 'secret')
+    const token = jwt.sign({ _id: user.id.toString() }, process.env.JWT_SECRET)
     user.tokens = user.tokens.concat({ token })
     await user.save()
     return token
@@ -133,31 +135,24 @@ userSchema.pre('remove', async function (next) {
     const user = this
     await JetSki.deleteMany({ owner: user._id })
     next()
-})
-
-userSchema.pre('remove', async function (next) {
+}).pre('remove', async function (next) {
     const user = this
     await Boat.deleteMany({ owner: user._id })
     next()
-})
-
-userSchema.pre('remove', async function (next) {
+}).pre('remove', async function (next) {
     const user = this
     await MotorCycle.deleteMany({ owner: user._id })
     next()
-})
-
-userSchema.pre('remove', async function (next) {
+}).pre('remove', async function (next) {
     const user = this
     await BiCycle.deleteMany({ owner: user._id })
     next()
-})
-
-userSchema.pre('remove', async function (next) {
+}).pre('remove', async function (next) {
     const user = this
     await Car.deleteMany({ owner: user._id })
     next()
 })
+
 
 
 // userSchema.plugin(passportlocalmongoose)

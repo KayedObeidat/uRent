@@ -75,19 +75,24 @@ router.get('/users', async (req, res) => {
     }
 })
 
-router.get('/users/:id', async (req, res) => {
-    const _id = req.params.id
-
-    try {
-        const user = await User.findById(_id)
-        if(!user){
-            return res.status(404).send()
-        }
-        res.send(user)
-    } catch(e) {
-        res.status(500).send()
-    }
+router.get('/users/me', auth, async (req, res) => {
+    res.send(req.user)
 })
+
+// router.get('/users/property', async(req, res) => {
+//     console.log(req.params.id)
+//     try{
+//         const user = await User.findById(req.params.id)
+//     if(!user){
+//         res.status(404).send()
+//     }
+//  //   const property = await user.populate('jetSkis').populate('cars').populate('boats').populate('motorCycles').populate('biCycles').execPopulate()
+//     res.send(property)
+//     } catch(e){
+//         res.status(500).send(e)
+//     }
+
+// })
 
 router.patch('/users/update/me', auth, async (req, res) => {
     const updates = Object.keys(req.body)
